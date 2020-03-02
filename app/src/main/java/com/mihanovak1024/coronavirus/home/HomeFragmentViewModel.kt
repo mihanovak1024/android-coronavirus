@@ -7,7 +7,7 @@ import com.mihanovak1024.coronavirus.data.DataSource
 import com.mihanovak1024.coronavirus.statistics.Statistics
 import timber.log.Timber
 
-class HomeViewModel(
+class HomeFragmentViewModel(
         private val dataSource: DataSource
 ) : ViewModel() {
 

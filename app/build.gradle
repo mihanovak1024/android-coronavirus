@@ -56,8 +56,9 @@ dependencies {
     implementation "com.jakewharton.timber:timber:$timber"
 
 
-    api "com.google.dagger:dagger:$dagger"
-    annotationProcessor "com.google.dagger:dagger-compiler:$dagger"
+    implementation "com.google.dagger:dagger:$dagger"
+    kapt "com.google.dagger:dagger-compiler:$dagger"
+    kapt "com.google.dagger:dagger-android-processor:$dagger"
 
     testImplementation "junit:junit:$junit"
     androidTestImplementation "androidx.test.ext:junit:$androidxJunit"

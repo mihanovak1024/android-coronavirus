@@ -6,7 +6,7 @@
 
         <variable
             name="homeViewModel"
-            type="com.mihanovak1024.coronavirus.home.HomeViewModel" />
+            type="com.mihanovak1024.coronavirus.home.HomeFragmentViewModel" />
     </data>
 
     <LinearLayout

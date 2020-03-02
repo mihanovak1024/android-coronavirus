@@ -6,16 +6,19 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.viewModelScope
-import com.mihanovak1024.coronavirus.data.network.RetrofitDataSource
 import com.mihanovak1024.coronavirus.databinding.HomeFragmentBinding
+import com.mihanovak1024.coronavirus.di.component.DaggerFragmentComponent
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 class HomeFragment : Fragment() {
 
+    @Inject
+    lateinit var homeFragmentViewModel: HomeFragmentViewModel
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
 
-        val retrofitDataSource = RetrofitDataSource()
-        val homeFragmentViewModel = HomeViewModel(retrofitDataSource)
+        DaggerFragmentComponent.builder().build().inject(this)
 
         val homeFragmentBinding = HomeFragmentBinding.inflate(inflater, container, false)
                 .apply {
