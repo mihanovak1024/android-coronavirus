@@ -1,29 +1,17 @@
 package com.mihanovak1024.coronavirus.data.network
 
 import com.mihanovak1024.coronavirus.data.CoronaCase
-import com.mihanovak1024.coronavirus.data.DataSource
 import com.mihanovak1024.coronavirus.data.TimeSeriesCaseAllData
 import com.mihanovak1024.coronavirus.data.TimeSeriesCaseData
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import retrofit2.Retrofit
-import retrofit2.converter.scalars.ScalarsConverterFactory
 import timber.log.Timber
 import java.util.*
 
 
-class RetrofitDataSource : DataSource {
-
-    private val webservice: CoronaVirusGithubDataWebservice
-
-    init {
-        val retrofit = Retrofit.Builder()
-                .baseUrl("https://raw.githubusercontent.com/")
-                .addConverterFactory(ScalarsConverterFactory.create())
-                .build()
-
-        webservice = retrofit.create(CoronaVirusGithubDataWebservice::class.java)
-    }
+class CoronaVirusGithubDataSource(
+        private val webservice: CoronaVirusGithubDataWebservice
+) : DataSource {
 
     override suspend fun getTimeSeriesCaseAllData(): TimeSeriesCaseAllData {
         Timber.d("getStatistics()")
@@ -31,7 +19,6 @@ class RetrofitDataSource : DataSource {
             return@withContext getTimeSeriesCaseOrderedData()
         }
     }
-
 
     private fun getTimeSeriesCaseOrderedData(): TimeSeriesCaseAllData {
         var casesPerDate = LinkedHashMap<String, LinkedHashMap<String, TimeSeriesCaseData>>()

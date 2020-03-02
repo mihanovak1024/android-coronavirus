@@ -1,6 +1,6 @@
 package com.mihanovak1024.coronavirus.data
 
-interface DataSource {
+interface Repository {
 
     suspend fun getTimeSeriesCaseAllData(): TimeSeriesCaseAllData
 

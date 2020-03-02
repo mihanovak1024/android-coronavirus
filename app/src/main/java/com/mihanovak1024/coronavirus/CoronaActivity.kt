@@ -5,7 +5,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.res.ResourcesCompat
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
-import com.mihanovak1024.coronavirus.data.DataSource
+import com.mihanovak1024.coronavirus.data.Repository
 import com.mihanovak1024.coronavirus.di.component.DaggerCoreComponent
 import kotlinx.android.synthetic.main.home_act.*
 import javax.inject.Inject
@@ -14,7 +14,7 @@ import javax.inject.Inject
 class CoronaActivity : AppCompatActivity() {
 
     @Inject
-    lateinit var dataSource: DataSource
+    lateinit var repository: Repository
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
