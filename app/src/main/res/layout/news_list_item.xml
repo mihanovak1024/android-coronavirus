@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<layout>
+
+    <data>
+
+<!--        <variable-->
+<!--            name="news"-->
+<!--            type="com.mihanovak1024.coronavirus.news.News" />-->
+
+<!--        <variable-->
+<!--            name="newsItemClickListener"-->
+<!--            type="com.mihanovak1024.coronavirus.news.NewsItemClickListener" />-->
+    </data>
+
+    <androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="100dp"
+        android:layout_margin="10dp"
+        app:cardCornerRadius="4dp"
+        app:cardUseCompatPadding="true">
+<!--                android:onClick="@{newsItemClickListener.onNewsItemClick(news.linkUrl)}"-->
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:padding="5dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:paddingBottom="10dp"
+                    android:textSize="20sp"
+                    tools:text="Something something" />
+
+<!--                                    android:text="@{news.title}"
+-->
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="5dp"
+                    tools:text="Today" />
+<!--                                    android:text="@{news.dateReadable}"
+-->
+            </LinearLayout>
+
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                tools:text="Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum " />
+        </LinearLayout>
+<!--        android:text="@{news.shortDescription}"-->
+
+
+    </androidx.cardview.widget.CardView>
+</layout>

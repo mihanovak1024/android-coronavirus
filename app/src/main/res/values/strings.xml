@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">CoronaVirus</string>
+    <string name="recovered">Recovered</string>
+    <string name="deaths">Deaths</string>
+    <string name="infected">Infected</string>
+    <string name="latest_news">Latest news</string>
+    <string name="local_data">Local</string>
+    <string name="worldwide_data">Worldwide</string>
+</resources>

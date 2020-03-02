@@ -1,0 +1,70 @@
+apply plugin: 'com.android.application'
+apply plugin: 'kotlin-android-extensions'
+apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-kapt'
+
+android {
+    compileSdkVersion 29
+    buildToolsVersion "29.0.2"
+    defaultConfig {
+        applicationId "com.mihanovak1024.coronavirus"
+        minSdkVersion 19
+        targetSdkVersion 29
+        versionCode 1
+        versionName "1.0"
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+
+    dataBinding {
+        enabled = true
+        enabledForTests = true
+    }
+
+    compileOptions {
+        sourceCompatibility = 1.8
+        targetCompatibility = 1.8
+    }
+
+    kotlinOptions {
+        jvmTarget = "1.8"
+    }
+}
+
+dependencies {
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+
+    implementation "androidx.appcompat:appcompat:$androidxAppCompat"
+
+    implementation "androidx.navigation:navigation-fragment-ktx:$androidxNavigation"
+    implementation "androidx.navigation:navigation-ui-ktx:$androidxNavigation"
+    implementation "androidx.cardview:cardview:$androidxCardView"
+    implementation "androidx.fragment:fragment-ktx:$androidxFragment"
+    implementation "com.android.support:support-fragment:$androidSupportFragment"
+
+    implementation "androidx.viewpager2:viewpager2:$androidxViewPager"
+    implementation "com.google.android.material:material:$androidMaterial"
+
+    implementation "com.squareup.retrofit2:retrofit:$retrofit"
+    implementation "com.squareup.retrofit2:converter-scalars:$retrofitScalarsConverter"
+    implementation "com.squareup.retrofit2:converter-gson:$retrofitGsonConverter"
+    implementation "com.jakewharton.timber:timber:$timber"
+
+
+    api "com.google.dagger:dagger:$dagger"
+    annotationProcessor "com.google.dagger:dagger-compiler:$dagger"
+
+    testImplementation "junit:junit:$junit"
+    androidTestImplementation "androidx.test.ext:junit:$androidxJunit"
+    androidTestImplementation "androidx.test.espresso:espresso-core:$androidxEsspressoCore"
+    implementation "androidx.core:core-ktx:$androidxKotlin"
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+}
+repositories {
+    mavenCentral()
+}

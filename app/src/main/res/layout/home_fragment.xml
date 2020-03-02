@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+        <variable
+            name="homeViewModel"
+            type="com.mihanovak1024.coronavirus.home.HomeViewModel" />
+    </data>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="10dp">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:text="@string/infected" />
+
+                <TextView
+                    android:id="@+id/infected_tv"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/bungee"
+                    android:gravity="center"
+                    android:text="@{Integer.toString(homeViewModel.numberStatistics.infectedNumber)}"
+                    android:textColor="@android:color/holo_red_dark"
+                    android:textSize="30sp"
+                    android:includeFontPadding="false"
+                    tools:text="24" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="10dp">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:text="@string/deaths" />
+
+                <TextView
+                    android:id="@+id/death_tv"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/bungee"
+
+                    android:gravity="center"
+                    android:text="@{Integer.toString(homeViewModel.numberStatistics.deathNumber)}"
+                    android:textColor="@android:color/black"
+                    android:textSize="30sp"
+                    android:includeFontPadding="false"
+                    tools:text="24" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="10dp">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:text="@string/recovered" />
+
+                <TextView
+                    android:id="@+id/recovered_tv"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/bungee"
+                    android:includeFontPadding="false"
+                    android:gravity="center"
+                    android:text="@{Integer.toString(homeViewModel.numberStatistics.recoveredNumber)}"
+                    android:textColor="@android:color/holo_green_dark"
+                    android:textSize="30sp"
+                    tools:text="24" />
+
+            </LinearLayout>
+        </LinearLayout>
+
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="20dp"
+            android:text="@string/latest_news"
+            android:textSize="20sp" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1" />
+
+    </LinearLayout>
+</layout>
