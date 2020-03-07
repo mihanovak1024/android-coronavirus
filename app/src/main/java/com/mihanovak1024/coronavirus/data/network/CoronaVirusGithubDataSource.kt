@@ -1,32 +1,29 @@
 package com.mihanovak1024.coronavirus.data.network
 
 import com.mihanovak1024.coronavirus.data.CoronaCase
-import com.mihanovak1024.coronavirus.data.TimeSeriesCaseAllData
-import com.mihanovak1024.coronavirus.data.TimeSeriesCaseData
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
+import com.mihanovak1024.coronavirus.data.database.time.TimeTypeConverter
+import com.mihanovak1024.coronavirus.data.model.timeseries.TimeSeriesCaseData
+import com.mihanovak1024.coronavirus.data.model.timeseries.TimeSeriesCasePlace
+import com.mihanovak1024.coronavirus.util.zeroPrefixed
+import org.threeten.bp.OffsetDateTime
 import timber.log.Timber
-import java.util.*
 
 
 class CoronaVirusGithubDataSource(
         private val webservice: CoronaVirusGithubDataWebservice
 ) : DataSource {
 
-    override suspend fun getTimeSeriesCaseAllData(): TimeSeriesCaseAllData {
-        Timber.d("getStatistics()")
-        return withContext(Dispatchers.IO) {
-            return@withContext getTimeSeriesCaseOrderedData()
-        }
-    }
-
-    private fun getTimeSeriesCaseOrderedData(): TimeSeriesCaseAllData {
-        var casesPerDate = LinkedHashMap<String, LinkedHashMap<String, TimeSeriesCaseData>>()
+    /**
+     * Creates three different calls to Github repo for INFECTED, DEATH and RECOVERED csv data files
+     * and extracts the data to a map based on OffsetDateTime and state_country keys and TimeSeriesCaseData.
+     */
+    override suspend fun getTimeSeriesCaseAllData(): LinkedHashMap<OffsetDateTime, LinkedHashMap<String, TimeSeriesCaseData>> {
+        Timber.d("getTimeSeriesCaseAllData")
+        val casesPerDate = LinkedHashMap<OffsetDateTime, LinkedHashMap<String, TimeSeriesCaseData>>()
 
         webservice.getCoronaVirusDataConfirmedCases().execute().body()?.let {
             addTimeSeriesCaseDataToMap(CoronaCase.INFECTED, it, casesPerDate)
         }
-
 
         webservice.getCoronaVirusDataDeathCases().execute().body()?.let {
             addTimeSeriesCaseDataToMap(CoronaCase.DEATH, it, casesPerDate)
@@ -36,48 +33,106 @@ class CoronaVirusGithubDataSource(
             addTimeSeriesCaseDataToMap(CoronaCase.RECOVERED, it, casesPerDate)
         }
 
-
-        return TimeSeriesCaseAllData(casesPerDate)
+        return casesPerDate
     }
 
-    private fun addTimeSeriesCaseDataToMap(coronaCase: CoronaCase, response: String, casesMap: LinkedHashMap<String, LinkedHashMap<String, TimeSeriesCaseData>>): LinkedHashMap<String, LinkedHashMap<String, TimeSeriesCaseData>> {
+    /**
+     * Extracts the Github CSV response data to a map based on OffsetDateTime and state_country keys
+     * and TimeSeriesCaseData values.
+     */
+    private fun addTimeSeriesCaseDataToMap(coronaCase: CoronaCase, response: String, casesMap: LinkedHashMap<OffsetDateTime, LinkedHashMap<String, TimeSeriesCaseData>>) {
         val lineSeparated = response.lines()
 
-        val dateList = lineSeparated.first().split(",").drop(4)
-
-        if (casesMap.isEmpty()) {
-            dateList.forEach {
+        val dateList = extractCsvDateListStringToMap(lineSeparated.first())
+        dateList.forEach {
+            if (!casesMap.contains(it)) {
                 casesMap[it] = LinkedHashMap()
             }
         }
 
+        // iterate through CSV lines except the first one,
+        // since it was already processed above
         lineSeparated.drop(1).forEach {
+            // splits each line by "," and preserves quoted sections
             val splitLine = it.split(",(?=(?:[^\\\"]*\\\"[^\\\"]*\\\")*[^\\\"]*\$)".toRegex())
 
-            val splitLineIterator = splitLine.iterator()
+            val timeSeriesCasePlace = transformCsvLocationInformationToObject(splitLine)
+            val placeString = timeSeriesCasePlace.stateCountry()
 
-
-            val state = splitLineIterator.next()
-            val country = splitLineIterator.next()
-            val lat = splitLineIterator.next().toDouble()
-            val long = splitLineIterator.next().toDouble()
-
+            // First 4 sections are about location
+            val splitLineIterator = splitLine.drop(4).iterator()
             val dateIterator = dateList.iterator()
-            splitLine.drop(4).forEach {
+            while (splitLineIterator.hasNext()) {
+                // There should be the same numbers of dates specified in first line
+                // and data specified in all other lines
+                val dataForDate = splitLineIterator.next()
                 val date = dateIterator.next()
-                val mapForDate = casesMap[date]
-                mapForDate!![state + "_" + country]?.let { timeSeriesCaseData ->
-                    when (coronaCase) {
-                        CoronaCase.INFECTED -> timeSeriesCaseData.infectedCases = it.toInt()
-                        CoronaCase.RECOVERED -> timeSeriesCaseData.recoveredCases = it.toInt()
-                        CoronaCase.DEATH -> timeSeriesCaseData.deathCases = it.toInt()
-                    }
+
+                val mapForDate = casesMap[date]!!
+                var mapForPlace = mapForDate[placeString]
+
+                if (mapForPlace == null) {
+                    mapForPlace = TimeSeriesCaseData(place = timeSeriesCasePlace, offsetDateTime = date)
+                    mapForDate[placeString] = mapForPlace
                 }
-                        ?: mapForDate.put(state + "_" + country, TimeSeriesCaseData(state, country, lat, long, date, it.toInt(), 0, 0))
+
+                when (coronaCase) {
+                    CoronaCase.INFECTED -> mapForPlace.infectedCases = dataForDate.toInt()
+                    CoronaCase.RECOVERED -> mapForPlace.recoveredCases = dataForDate.toInt()
+                    CoronaCase.DEATH -> mapForPlace.deathCases = dataForDate.toInt()
+                }
             }
         }
+    }
 
-        return casesMap
+    /**
+     * Method responsible for extracting date from string list to [OffsetDateTime] list.
+     *
+     * The first line of the Github CSV looks like:
+     * Province/State,Country/Region,Lat,Long,1/22/20,1/23/20,1/24/20,1/25/20,...
+     */
+    private fun extractCsvDateListStringToMap(firstCsvLine: String): List<OffsetDateTime> {
+        // bottom line splits it by "," and drops the first four sections resulting in list of dates
+        return firstCsvLine.split(",").drop(4).map { dateNonFormatted ->
+            // Each date of format "month/day/year" is then transformed to OffsetDateTime
+            dateNonFormatted.split("/").let {
+                val day = it[1].zeroPrefixed()
+                val month = it[0].zeroPrefixed()
+                val year = "20${it[2]}"
+                // Since data is provided daily there's no information of a specific time,
+                // thus midnight will do for now
+                val time = "T00:00Z"
+                val dateTimeFormatted = "${year}-${month}-${day}${time}"
+                TimeTypeConverter.toOffsetDateTime(dateTimeFormatted)!!
+            }
+
+        }
+    }
+
+
+    /**
+     * Method responsible for parsing the first four sections of the line into a location object [TimeSeriesCasePlace].
+     *
+     * Each line of the Github CSV looks like:
+     * Province/State,Country/Region,Lat,Long,1/22/20,1/23/20,1/24/20,1/25/20,...
+     *
+     * This method extracts Province/State,Country/Region,Lat,Long into [TimeSeriesCasePlace]
+     */
+    private fun transformCsvLocationInformationToObject(dataListLine: List<String>): TimeSeriesCasePlace {
+        val splitLineIterator = dataListLine.listIterator()
+        // Format of CSV lines:
+        // Province/State, Country/Region, Lat, Long, 1/22/20 data, 1/23/20 data, 1/24/20 data,...
+        val state = splitLineIterator.next()
+        val country = splitLineIterator.next()
+        val latitude = splitLineIterator.next().toDouble()
+        val longitude = splitLineIterator.next().toDouble()
+
+        return TimeSeriesCasePlace(
+                state = state,
+                country = country,
+                latitude = latitude,
+                longitude = longitude
+        )
     }
 
 }

@@ -5,10 +5,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.viewModelScope
 import com.mihanovak1024.coronavirus.databinding.HomeFragmentBinding
 import com.mihanovak1024.coronavirus.di.component.DaggerFragmentComponent
-import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 class HomeFragment : Fragment() {
@@ -18,16 +16,12 @@ class HomeFragment : Fragment() {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
 
-        DaggerFragmentComponent.builder().build().inject(this)
+        DaggerFragmentComponent.builder().appContext(requireActivity().applicationContext).build().inject(this)
 
         val homeFragmentBinding = HomeFragmentBinding.inflate(inflater, container, false)
                 .apply {
                     homeViewModel = homeFragmentViewModel
                 }
-
-        homeFragmentViewModel.viewModelScope.launch {
-            homeFragmentViewModel.updateNumberStatistics()
-        }
 
         homeFragmentBinding.lifecycleOwner = this
 

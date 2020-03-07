@@ -13,6 +13,14 @@ android {
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+
+        javaCompileOptions {
+            annotationProcessorOptions {
+                arguments = [
+                        "room.incremental":"true"
+                ]
+            }
+        }
     }
     buildTypes {
         release {
@@ -54,6 +62,14 @@ dependencies {
     implementation "com.squareup.retrofit2:converter-scalars:$retrofitScalarsConverter"
     implementation "com.squareup.retrofit2:converter-gson:$retrofitGsonConverter"
     implementation "com.jakewharton.timber:timber:$timber"
+
+    implementation "androidx.room:room-runtime:$room"
+    implementation "org.threeten:threetenbp:$threetenDateTime"
+    kapt "androidx.room:room-compiler:$room"
+    implementation "androidx.room:room-ktx:$room"
+
+    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutines"
+    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:$coroutines"
 
 
     implementation "com.google.dagger:dagger:$dagger"
