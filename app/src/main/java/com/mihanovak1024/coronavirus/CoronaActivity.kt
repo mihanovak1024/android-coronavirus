@@ -5,7 +5,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.res.ResourcesCompat
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
-import com.mihanovak1024.coronavirus.data.DataSource
+import com.mihanovak1024.coronavirus.data.Repository
 import com.mihanovak1024.coronavirus.di.component.DaggerCoreComponent
 import kotlinx.android.synthetic.main.home_act.*
 import javax.inject.Inject
@@ -14,13 +14,14 @@ import javax.inject.Inject
 class CoronaActivity : AppCompatActivity() {
 
     @Inject
-    lateinit var dataSource: DataSource
+    lateinit var repository: Repository
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.home_act)
 
         DaggerCoreComponent.builder()
+                .appContext(applicationContext)
                 .build()
                 .inject(this)
 
@@ -38,24 +39,19 @@ class CoronaActivity : AppCompatActivity() {
                     val drawableId: Int
                     when (position) {
                         1 -> {
-                            drawableId = R.drawable.ic_news
-                            text = "News"
+                            drawableId = R.drawable.ic_news; text = "News"
                         }
                         2 -> {
-                            drawableId = R.drawable.ic_map
-                            text = "Map"
+                            drawableId = R.drawable.ic_map; text = "Map"
                         }
                         3 -> {
-                            drawableId = R.drawable.ic_statistics
-                            text = "Statistics"
+                            drawableId = R.drawable.ic_statistics; text = "Statistics"
                         }
                         4 -> {
-                            drawableId = R.drawable.ic_info
-                            text = "Info"
+                            drawableId = R.drawable.ic_info; text = "Info"
                         }
                         else -> {
-                            drawableId = R.drawable.ic_home
-                            text = "Home"
+                            drawableId = R.drawable.ic_home; text = "Home"
                         }
                     }
                     tab.icon = ResourcesCompat.getDrawable(resources, drawableId, null)

@@ -39,7 +39,7 @@
                     android:layout_height="wrap_content"
                     android:fontFamily="@font/bungee"
                     android:gravity="center"
-                    android:text="@{Integer.toString(homeViewModel.numberStatistics.infectedNumber)}"
+                    android:text="@{Integer.toString(homeViewModel.numberDailyStatistics.infectedNumber)}"
                     android:textColor="@android:color/holo_red_dark"
                     android:textSize="30sp"
                     android:includeFontPadding="false"
@@ -65,7 +65,7 @@
                     android:fontFamily="@font/bungee"
 
                     android:gravity="center"
-                    android:text="@{Integer.toString(homeViewModel.numberStatistics.deathNumber)}"
+                    android:text="@{Integer.toString(homeViewModel.numberDailyStatistics.deathNumber)}"
                     android:textColor="@android:color/black"
                     android:textSize="30sp"
                     android:includeFontPadding="false"
@@ -91,7 +91,7 @@
                     android:fontFamily="@font/bungee"
                     android:includeFontPadding="false"
                     android:gravity="center"
-                    android:text="@{Integer.toString(homeViewModel.numberStatistics.recoveredNumber)}"
+                    android:text="@{Integer.toString(homeViewModel.numberDailyStatistics.recoveredNumber)}"
                     android:textColor="@android:color/holo_green_dark"
                     android:textSize="30sp"
                     tools:text="24" />

@@ -1,0 +1,3 @@
+- Rewrite TabLayout to Bottom Navigation Bar
+- get ViewModel from ViewModelFactory
+- fetch bulk data only first time, then fetch per day

@@ -13,6 +13,14 @@ android {
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+
+        javaCompileOptions {
+            annotationProcessorOptions {
+                arguments = [
+                        "room.incremental":"true"
+                ]
+            }
+        }
     }
     buildTypes {
         release {
@@ -55,16 +63,24 @@ dependencies {
     implementation "com.squareup.retrofit2:converter-gson:$retrofitGsonConverter"
     implementation "com.jakewharton.timber:timber:$timber"
 
+    implementation "androidx.room:room-runtime:$room"
+    implementation "org.threeten:threetenbp:$threetenDateTime"
+    kapt "androidx.room:room-compiler:$room"
+    implementation "androidx.room:room-ktx:$room"
+
+    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutines"
+    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:$coroutines"
+    implementation "androidx.core:core-ktx:$androidxKotlin"
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
 
     implementation "com.google.dagger:dagger:$dagger"
     kapt "com.google.dagger:dagger-compiler:$dagger"
     kapt "com.google.dagger:dagger-android-processor:$dagger"
 
+    testImplementation "org.mockito:mockito-all:$mockito"
     testImplementation "junit:junit:$junit"
     androidTestImplementation "androidx.test.ext:junit:$androidxJunit"
     androidTestImplementation "androidx.test.espresso:espresso-core:$androidxEsspressoCore"
-    implementation "androidx.core:core-ktx:$androidxKotlin"
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
 }
 repositories {
     mavenCentral()
