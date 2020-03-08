@@ -46,6 +46,7 @@ ext {
     androidxEsspressoCore = "3.2.0"
     androidxJunit = "1.1.0"
     junit = "4.12"
+    mockito = "2.0.2-beta"
 }
 
 allprojects {

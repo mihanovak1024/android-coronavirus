@@ -6,6 +6,7 @@ import com.mihanovak1024.coronavirus.data.DataRepository
 import com.mihanovak1024.coronavirus.data.Repository
 import com.mihanovak1024.coronavirus.data.database.CoronaVirusDatabase
 import com.mihanovak1024.coronavirus.data.network.CoronaVirusGithubDataSource
+import com.mihanovak1024.coronavirus.data.network.CoronaVirusGithubDataSourceExtractor
 import com.mihanovak1024.coronavirus.data.network.CoronaVirusGithubDataWebservice
 import com.mihanovak1024.coronavirus.data.network.DataSource
 import dagger.Module
@@ -21,7 +22,7 @@ class DataModule {
     @Singleton
     @Provides
     @Named("coronaVirusGithubDataSource")
-    fun provideDataSource(webservice: CoronaVirusGithubDataWebservice): DataSource = CoronaVirusGithubDataSource(webservice)
+    fun provideDataSource(webservice: CoronaVirusGithubDataWebservice, dataSourceExtractor: CoronaVirusGithubDataSourceExtractor): DataSource = CoronaVirusGithubDataSource(webservice, dataSourceExtractor)
 
     @Singleton
     @Provides
@@ -45,5 +46,9 @@ class DataModule {
     @Singleton
     @Provides
     fun provideRepository(@Named("coronaVirusGithubDataSource") dataSource: DataSource, coronaVirusDatabase: CoronaVirusDatabase): Repository = DataRepository(dataSource, coronaVirusDatabase.timeSeriesCaseDataDao(), coronaVirusDatabase.timeSeriesCasePlaceDao(), coronaVirusDatabase.statisticsDao())
+
+    @Singleton
+    @Provides
+    fun provideDataSourceExtractor() = CoronaVirusGithubDataSourceExtractor()
 
 }
