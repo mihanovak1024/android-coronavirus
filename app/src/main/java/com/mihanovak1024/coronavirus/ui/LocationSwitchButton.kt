@@ -4,6 +4,7 @@ import android.content.Context
 import android.util.AttributeSet
 import android.util.TypedValue
 import android.view.LayoutInflater
+import android.view.View
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.core.content.res.ResourcesCompat
@@ -16,6 +17,7 @@ import kotlinx.android.synthetic.main.location_switch_button.view.*
 class LocationSwitchButton : LinearLayout {
 
     private var localButtonAlreadyClicked = false
+    private lateinit var onLocalButtonClickCallback: OnLocalButtonClickCallback
 
     constructor(context: Context) : super(context) {
         initViews()
@@ -36,10 +38,10 @@ class LocationSwitchButton : LinearLayout {
 
         val localCountrySP = getDefaultSharedPreference(context).getString(LOCAL_COUNTRY_STRING_SP, "Local")
         if (localCountrySP!!.isNotEmpty()) {
-            local_button.text = localCountrySP
+            updateLocalSwitchCountryName(localCountrySP)
         }
         local_button.setOnClickListener {
-            localButtonClicked()
+            localButtonClicked(it)
         }
         worldwide_button.setOnClickListener {
             worldwideButtonClicked()
@@ -53,9 +55,9 @@ class LocationSwitchButton : LinearLayout {
         }
     }
 
-    private fun localButtonClicked() {
+    private fun localButtonClicked(view: View) {
         if (localButtonAlreadyClicked) {
-            // todo open dialog
+            onLocalButtonClickCallback.onLocalButtonClicked(view.context)
         } else {
             localButtonAlreadyClicked = true
             switchLocalWorldwideButtonsStyle(local_button, worldwide_button)
@@ -75,5 +77,17 @@ class LocationSwitchButton : LinearLayout {
         disabledView.layoutParams = (disabledView.layoutParams as LayoutParams).apply {
             weight = 1f
         }
+    }
+
+    fun updateLocalSwitchCountryName(countryName: String) {
+        local_button.text = countryName
+    }
+
+    fun setOnLocalButtonClickCallback(onLocalButtonClickCallback: OnLocalButtonClickCallback) {
+        this.onLocalButtonClickCallback = onLocalButtonClickCallback
+    }
+
+    interface OnLocalButtonClickCallback {
+        fun onLocalButtonClicked(context: Context)
     }
 }

@@ -11,4 +11,6 @@ interface Repository {
 
     fun getStatisticsForDate(date: OffsetDateTime): LiveData<DailyStatistics>
 
+    fun getInfectedLocations(): LiveData<List<String>>
+
 }

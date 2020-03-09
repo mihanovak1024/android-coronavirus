@@ -38,6 +38,13 @@ class DataRepository(
         return dailyStatisticsDao.loadStatisticsForDate(date)
     }
 
+    override fun getInfectedLocations(): LiveData<List<String>> {
+        Timber.d("getInfectedLocations")
+        refreshTimeSeriesDataAsync()
+
+        return timeSeriesCasePlaceDao.loadCountries()
+    }
+
     private fun refreshTimeSeriesDataAsync() {
         GlobalScope.launch(Dispatchers.IO) {
             Timber.d("refreshTimeSeriesDataAsync")

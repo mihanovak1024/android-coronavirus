@@ -1,12 +1,20 @@
 package com.mihanovak1024.coronavirus
 
+import android.content.Context
 import android.os.Bundle
+import android.view.View.GONE
+import android.view.View.VISIBLE
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.res.ResourcesCompat
+import androidx.lifecycle.Observer
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 import com.mihanovak1024.coronavirus.data.Repository
 import com.mihanovak1024.coronavirus.di.component.DaggerCoreComponent
+import com.mihanovak1024.coronavirus.ui.LocationSwitchButton
+import com.mihanovak1024.coronavirus.util.LOCAL_COUNTRY_STRING_SP
+import com.mihanovak1024.coronavirus.util.getDefaultSharedPreference
 import kotlinx.android.synthetic.main.home_act.*
 import javax.inject.Inject
 
@@ -26,6 +34,34 @@ class CoronaActivity : AppCompatActivity() {
                 .inject(this)
 
         prepareViewPager()
+
+        location_switch_button.setOnLocalButtonClickCallback(
+                object : LocationSwitchButton.OnLocalButtonClickCallback {
+                    override fun onLocalButtonClicked(context: Context) {
+                        openDialog()
+                    }
+                }
+        )
+    }
+
+    private fun openDialog() {
+        progress_bar.visibility = VISIBLE
+        repository.getInfectedLocations().observe(this, Observer {
+            progress_bar.visibility = GONE
+
+            val builder = AlertDialog.Builder(this@CoronaActivity, R.style.LocationDialogTheme)
+            builder.setItems(it.toTypedArray()) { dialog, which ->
+                // todo Create MVP logic
+                val sharedPreferences = getDefaultSharedPreference(baseContext).edit()
+                sharedPreferences.putString(LOCAL_COUNTRY_STRING_SP, it[which])
+                sharedPreferences.apply()
+                location_switch_button.updateLocalSwitchCountryName(it[which])
+                dialog.dismiss()
+            }
+
+            val dialog = builder.create()
+            dialog.show()
+        })
     }
 
     private fun prepareViewPager() {
