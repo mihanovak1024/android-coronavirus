@@ -4,11 +4,11 @@ import android.content.Context
 import android.util.AttributeSet
 import android.util.TypedValue
 import android.view.LayoutInflater
-import android.view.View
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.core.content.res.ResourcesCompat
 import com.mihanovak1024.coronavirus.R
+import com.mihanovak1024.coronavirus.util.LOCAL_COUNTRY_CLICKED_SP
 import com.mihanovak1024.coronavirus.util.LOCAL_COUNTRY_STRING_SP
 import com.mihanovak1024.coronavirus.util.getDefaultSharedPreference
 import kotlinx.android.synthetic.main.location_switch_button.view.*
@@ -17,7 +17,7 @@ import kotlinx.android.synthetic.main.location_switch_button.view.*
 class LocationSwitchButton : LinearLayout {
 
     private var localButtonAlreadyClicked = false
-    private lateinit var onLocalButtonClickCallback: OnLocalButtonClickCallback
+    private var onLocationSwitchClickCallback: OnLocationSwitchClickCallback? = null
 
     constructor(context: Context) : super(context) {
         initViews()
@@ -36,32 +36,49 @@ class LocationSwitchButton : LinearLayout {
                 .getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
         inflater.inflate(R.layout.location_switch_button, this, true)
 
-        val localCountrySP = getDefaultSharedPreference(context).getString(LOCAL_COUNTRY_STRING_SP, "Local")
-        if (localCountrySP!!.isNotEmpty()) {
-            updateLocalSwitchCountryName(localCountrySP)
+        val sharedPreferences = getDefaultSharedPreference(context)
+        val country = sharedPreferences.getString(LOCAL_COUNTRY_STRING_SP, "Local")
+        if (country!!.isNotEmpty()) {
+            updateLocalSwitchCountryName(country)
         }
+        val countryClicked = sharedPreferences.getBoolean(LOCAL_COUNTRY_CLICKED_SP, false)
+        if (countryClicked) {
+            localButtonClicked()
+        } else {
+            worldwideButtonClicked()
+        }
+
         local_button.setOnClickListener {
-            localButtonClicked(it)
+            localButtonClicked()
         }
         worldwide_button.setOnClickListener {
             worldwideButtonClicked()
         }
+
     }
 
     private fun worldwideButtonClicked() {
         if (localButtonAlreadyClicked) {
             localButtonAlreadyClicked = false
             switchLocalWorldwideButtonsStyle(worldwide_button, local_button)
+            updateSharedPreferencesClick(false)
+            onLocationSwitchClickCallback?.onWorldwideButtonClicked(context)
         }
     }
 
-    private fun localButtonClicked(view: View) {
-        if (localButtonAlreadyClicked) {
-            onLocalButtonClickCallback.onLocalButtonClicked(view.context)
-        } else {
+    private fun localButtonClicked() {
+        onLocationSwitchClickCallback?.onLocalButtonClicked(context, !localButtonAlreadyClicked)
+        if (!localButtonAlreadyClicked) {
             localButtonAlreadyClicked = true
             switchLocalWorldwideButtonsStyle(local_button, worldwide_button)
+            updateSharedPreferencesClick(true)
         }
+    }
+
+    private fun updateSharedPreferencesClick(countryClicked: Boolean) {
+        val sharedPreferencesEditor = getDefaultSharedPreference(context).edit()
+        sharedPreferencesEditor.putBoolean(LOCAL_COUNTRY_CLICKED_SP, countryClicked)
+        sharedPreferencesEditor.apply()
     }
 
     private fun switchLocalWorldwideButtonsStyle(enabledView: TextView, disabledView: TextView) {
@@ -83,11 +100,12 @@ class LocationSwitchButton : LinearLayout {
         local_button.text = countryName
     }
 
-    fun setOnLocalButtonClickCallback(onLocalButtonClickCallback: OnLocalButtonClickCallback) {
-        this.onLocalButtonClickCallback = onLocalButtonClickCallback
+    fun setOnLocationSwitchClickCallback(onLocationSwitchClickCallback: OnLocationSwitchClickCallback) {
+        this.onLocationSwitchClickCallback = onLocationSwitchClickCallback
     }
 
-    interface OnLocalButtonClickCallback {
-        fun onLocalButtonClicked(context: Context)
+    interface OnLocationSwitchClickCallback {
+        fun onLocalButtonClicked(context: Context, firstTime: Boolean)
+        fun onWorldwideButtonClicked(context: Context)
     }
 }

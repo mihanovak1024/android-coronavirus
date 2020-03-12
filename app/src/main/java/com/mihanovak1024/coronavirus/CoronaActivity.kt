@@ -8,11 +8,14 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.res.ResourcesCompat
 import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProvider
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
+import com.mihanovak1024.coronavirus.data.CoronaActivityViewModel
 import com.mihanovak1024.coronavirus.data.Repository
 import com.mihanovak1024.coronavirus.di.component.DaggerCoreComponent
 import com.mihanovak1024.coronavirus.ui.LocationSwitchButton
+import com.mihanovak1024.coronavirus.util.LOCAL_COUNTRY_CLICKED_SP
 import com.mihanovak1024.coronavirus.util.LOCAL_COUNTRY_STRING_SP
 import com.mihanovak1024.coronavirus.util.getDefaultSharedPreference
 import kotlinx.android.synthetic.main.home_act.*
@@ -20,6 +23,8 @@ import javax.inject.Inject
 
 
 class CoronaActivity : AppCompatActivity() {
+
+    lateinit var coronaActivityViewModel: CoronaActivityViewModel
 
     @Inject
     lateinit var repository: Repository
@@ -33,35 +38,57 @@ class CoronaActivity : AppCompatActivity() {
                 .build()
                 .inject(this)
 
+        coronaActivityViewModel = ViewModelProvider(this).get(CoronaActivityViewModel::class.java)
+
         prepareViewPager()
 
-        location_switch_button.setOnLocalButtonClickCallback(
-                object : LocationSwitchButton.OnLocalButtonClickCallback {
-                    override fun onLocalButtonClicked(context: Context) {
-                        openDialog()
+        location_switch_button.setOnLocationSwitchClickCallback(
+                object : LocationSwitchButton.OnLocationSwitchClickCallback {
+                    override fun onLocalButtonClicked(context: Context, firstTime: Boolean) {
+                        updateViewModelCountryState()
+                        if (!firstTime) {
+                            openDialog()
+                        }
+                    }
+
+                    override fun onWorldwideButtonClicked(context: Context) {
+                        updateViewModelCountryState()
                     }
                 }
         )
+
+        updateViewModelCountryState()
     }
 
     private fun openDialog() {
         progress_bar.visibility = VISIBLE
-        repository.getInfectedLocations().observe(this, Observer {
+        repository.getInfectedCountries().observe(this, Observer {
             progress_bar.visibility = GONE
 
             val builder = AlertDialog.Builder(this@CoronaActivity, R.style.LocationDialogTheme)
             builder.setItems(it.toTypedArray()) { dialog, which ->
-                // todo Create MVP logic
                 val sharedPreferences = getDefaultSharedPreference(baseContext).edit()
                 sharedPreferences.putString(LOCAL_COUNTRY_STRING_SP, it[which])
                 sharedPreferences.apply()
+
                 location_switch_button.updateLocalSwitchCountryName(it[which])
+                coronaActivityViewModel.country.value = it[which]
+
                 dialog.dismiss()
             }
 
             val dialog = builder.create()
             dialog.show()
         })
+    }
+
+    private fun updateViewModelCountryState() {
+        val sharedPreferences = getDefaultSharedPreference(baseContext)
+        coronaActivityViewModel.country.value =
+                if (sharedPreferences.getBoolean(LOCAL_COUNTRY_CLICKED_SP, false))
+                    sharedPreferences.getString(LOCAL_COUNTRY_STRING_SP, "worldwide")
+                else
+                    "worldwide"
     }
 
     private fun prepareViewPager() {
@@ -75,16 +102,7 @@ class CoronaActivity : AppCompatActivity() {
                     val drawableId: Int
                     when (position) {
                         1 -> {
-                            drawableId = R.drawable.ic_news; text = "News"
-                        }
-                        2 -> {
-                            drawableId = R.drawable.ic_map; text = "Map"
-                        }
-                        3 -> {
                             drawableId = R.drawable.ic_statistics; text = "Statistics"
-                        }
-                        4 -> {
-                            drawableId = R.drawable.ic_info; text = "Info"
                         }
                         else -> {
                             drawableId = R.drawable.ic_home; text = "Home"

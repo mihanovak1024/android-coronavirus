@@ -45,7 +45,7 @@ class DataModule {
 
     @Singleton
     @Provides
-    fun provideRepository(@Named("coronaVirusGithubDataSource") dataSource: DataSource, coronaVirusDatabase: CoronaVirusDatabase): Repository = DataRepository(dataSource, coronaVirusDatabase.timeSeriesCaseDataDao(), coronaVirusDatabase.timeSeriesCasePlaceDao(), coronaVirusDatabase.statisticsDao())
+    fun provideRepository(@Named("coronaVirusGithubDataSource") dataSource: DataSource, coronaVirusDatabase: CoronaVirusDatabase): Repository = DataRepository(dataSource, coronaVirusDatabase.timeSeriesCaseDataDao(), coronaVirusDatabase.timeSeriesCasePlaceDao())
 
     @Singleton
     @Provides

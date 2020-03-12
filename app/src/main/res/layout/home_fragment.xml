@@ -39,7 +39,7 @@
                     android:layout_height="wrap_content"
                     android:fontFamily="@font/bungee"
                     android:gravity="center"
-                    android:text="@{Integer.toString(homeViewModel.numberDailyStatistics.infectedNumber)}"
+                    android:text="@{Integer.toString(homeViewModel.numberDailyStatistics.infectedCases)}"
                     android:textColor="@android:color/holo_red_dark"
                     android:textSize="30sp"
                     android:includeFontPadding="false"
@@ -65,7 +65,7 @@
                     android:fontFamily="@font/bungee"
 
                     android:gravity="center"
-                    android:text="@{Integer.toString(homeViewModel.numberDailyStatistics.deathNumber)}"
+                    android:text="@{Integer.toString(homeViewModel.numberDailyStatistics.deathCases)}"
                     android:textColor="@android:color/black"
                     android:textSize="30sp"
                     android:includeFontPadding="false"
@@ -91,21 +91,13 @@
                     android:fontFamily="@font/bungee"
                     android:includeFontPadding="false"
                     android:gravity="center"
-                    android:text="@{Integer.toString(homeViewModel.numberDailyStatistics.recoveredNumber)}"
+                    android:text="@{Integer.toString(homeViewModel.numberDailyStatistics.recoveredCases)}"
                     android:textColor="@android:color/holo_green_dark"
                     android:textSize="30sp"
                     tools:text="24" />
 
             </LinearLayout>
         </LinearLayout>
-
-
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:padding="20dp"
-            android:text="@string/latest_news"
-            android:textSize="20sp" />
 
         <androidx.recyclerview.widget.RecyclerView
             android:layout_width="match_parent"
