@@ -44,9 +44,9 @@ class CoronaActivity : AppCompatActivity() {
 
         location_switch_button.setOnLocationSwitchClickCallback(
                 object : LocationSwitchButton.OnLocationSwitchClickCallback {
-                    override fun onLocalButtonClicked(context: Context, firstTime: Boolean) {
+                    override fun onLocalButtonClicked(context: Context, shouldOpenDialog: Boolean) {
                         updateViewModelCountryState()
-                        if (!firstTime) {
+                        if (shouldOpenDialog) {
                             openDialog()
                         }
                     }

@@ -16,6 +16,8 @@ import kotlinx.android.synthetic.main.location_switch_button.view.*
 
 class LocationSwitchButton : LinearLayout {
 
+    private val DEFAULT_VALUE_LOCAL = "Local"
+
     private var localButtonAlreadyClicked = false
     private var onLocationSwitchClickCallback: OnLocationSwitchClickCallback? = null
 
@@ -37,7 +39,7 @@ class LocationSwitchButton : LinearLayout {
         inflater.inflate(R.layout.location_switch_button, this, true)
 
         val sharedPreferences = getDefaultSharedPreference(context)
-        val country = sharedPreferences.getString(LOCAL_COUNTRY_STRING_SP, "Local")
+        val country = sharedPreferences.getString(LOCAL_COUNTRY_STRING_SP, DEFAULT_VALUE_LOCAL)
         if (country!!.isNotEmpty()) {
             updateLocalSwitchCountryName(country)
         }
@@ -67,13 +69,13 @@ class LocationSwitchButton : LinearLayout {
     }
 
     private fun localButtonClicked() {
-        var firstClick = !localButtonAlreadyClicked
+        val shouldOpenDialog = localButtonAlreadyClicked || local_button.text == DEFAULT_VALUE_LOCAL
         if (!localButtonAlreadyClicked) {
             localButtonAlreadyClicked = true
             switchLocalWorldwideButtonsStyle(local_button, worldwide_button)
             updateSharedPreferencesClick(true)
         }
-        onLocationSwitchClickCallback?.onLocalButtonClicked(context, firstClick)
+        onLocationSwitchClickCallback?.onLocalButtonClicked(context, shouldOpenDialog)
     }
 
     private fun updateSharedPreferencesClick(countryClicked: Boolean) {
