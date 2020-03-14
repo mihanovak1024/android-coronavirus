@@ -95,8 +95,8 @@ class CoronaVirusGithubDataSourceExtractor {
         val splitLineIterator = dataListLine.listIterator()
         // Format of CSV lines:
         // Province/State, Country/Region, Lat, Long, 1/22/20 data, 1/23/20 data, 1/24/20 data,...
-        val state = splitLineIterator.next()
-        val country = splitLineIterator.next()
+        val state = splitLineIterator.next().replace("\"", "")
+        val country = splitLineIterator.next().replace("\"", "")
         val latitude = splitLineIterator.next().toDouble()
         val longitude = splitLineIterator.next().toDouble()
 
