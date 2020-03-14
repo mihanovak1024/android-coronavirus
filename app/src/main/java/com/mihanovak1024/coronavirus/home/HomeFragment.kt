@@ -6,7 +6,6 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProvider
 import com.mihanovak1024.coronavirus.data.CoronaActivityViewModel
 import com.mihanovak1024.coronavirus.databinding.HomeFragmentBinding
 import com.mihanovak1024.coronavirus.di.component.DaggerFragmentComponent
@@ -17,10 +16,14 @@ class HomeFragment : Fragment() {
     @Inject
     lateinit var homeFragmentViewModel: HomeFragmentViewModel
 
+    @Inject
+    lateinit var activityViewModel: CoronaActivityViewModel
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
 
         DaggerFragmentComponent.builder()
                 .appContext(requireActivity().applicationContext)
+                .viewModelStoreOwner(requireActivity())
                 .build()
                 .inject(this)
 
@@ -43,8 +46,7 @@ class HomeFragment : Fragment() {
 
     private fun observeActivityCountry() {
         activity?.let { fragmentActivity ->
-            val coronaActivityViewModel = ViewModelProvider(fragmentActivity).get(CoronaActivityViewModel::class.java)
-            coronaActivityViewModel.country.observe(viewLifecycleOwner, Observer {
+            activityViewModel.country.observe(viewLifecycleOwner, Observer {
                 homeFragmentViewModel.country.value = it
             })
         }

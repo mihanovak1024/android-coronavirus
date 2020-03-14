@@ -38,8 +38,13 @@ class CoronaActivity : AppCompatActivity() {
                 .build()
                 .inject(this)
 
-        coronaActivityViewModel = ViewModelProvider(this).get(CoronaActivityViewModel::class.java)
+        initViews()
 
+        updateViewModelCountryState()
+    }
+
+    private fun initViews() {
+        coronaActivityViewModel = ViewModelProvider(this).get(CoronaActivityViewModel::class.java)
         prepareViewPager()
 
         location_switch_button.setOnLocationSwitchClickCallback(
@@ -56,8 +61,6 @@ class CoronaActivity : AppCompatActivity() {
                     }
                 }
         )
-
-        updateViewModelCountryState()
     }
 
     private fun openDialog() {

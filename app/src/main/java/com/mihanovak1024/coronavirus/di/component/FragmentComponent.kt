@@ -1,6 +1,7 @@
 package com.mihanovak1024.coronavirus.di.component
 
 import android.content.Context
+import androidx.lifecycle.ViewModelStoreOwner
 import com.mihanovak1024.coronavirus.di.module.ViewModelModule
 import com.mihanovak1024.coronavirus.home.HomeFragment
 import dagger.BindsInstance
@@ -22,6 +23,9 @@ interface FragmentComponent {
 
         @BindsInstance
         fun appContext(applicationContext: Context): Builder
+
+        @BindsInstance
+        fun viewModelStoreOwner(viewModelStoreOwner: ViewModelStoreOwner): Builder
 
         fun build(): FragmentComponent
     }
