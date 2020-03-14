@@ -8,7 +8,7 @@ interface Repository {
 
     fun getTimeSeriesCaseAllDataForDate(date: OffsetDateTime): LiveData<List<TimeSeriesCaseData>>
 
-    fun getTimeSeriesCaseDataForLastDateAndCountry(country: String): LiveData<TimeSeriesCaseData>
+    fun getTimeSeriesCaseDataForLastDateAndCountry(country: String): LiveData<List<TimeSeriesCaseData>>
 
     fun getInfectedCountries(): LiveData<List<String>>
 

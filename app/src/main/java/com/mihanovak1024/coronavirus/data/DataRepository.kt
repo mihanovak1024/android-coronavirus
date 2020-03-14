@@ -28,7 +28,7 @@ class DataRepository(
         return timeSeriesCaseDataDao.loadForDate(date)
     }
 
-    override fun getTimeSeriesCaseDataForLastDateAndCountry(country: String): LiveData<TimeSeriesCaseData> {
+    override fun getTimeSeriesCaseDataForLastDateAndCountry(country: String): LiveData<List<TimeSeriesCaseData>> {
         Timber.d("getTimeSeriesCaseDataForLastDateAndPlace")
         refreshTimeSeriesDataAsync()
 

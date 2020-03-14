@@ -12,8 +12,12 @@ class HomeFragmentViewModel(
 ) : ViewModel() {
 
     val country = MutableLiveData<String>("worldwide")
-    val numberDailyStatistics: LiveData<TimeSeriesCaseData> = Transformations.switchMap(country) {
+    val numberDailyStatistics: LiveData<List<TimeSeriesCaseData>> = Transformations.switchMap(country) {
         repository.getTimeSeriesCaseDataForLastDateAndCountry(it)
     }
+
+    val infected = MutableLiveData<String>("0")
+    val recovered = MutableLiveData<String>("0")
+    val deaths = MutableLiveData<String>("0")
 
 }

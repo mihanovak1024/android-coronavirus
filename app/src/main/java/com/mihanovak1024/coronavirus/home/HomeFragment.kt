@@ -24,21 +24,46 @@ class HomeFragment : Fragment() {
                 .build()
                 .inject(this)
 
+        val homeFragmentBinding = HomeFragmentBinding.inflate(inflater, container, false)
+                .apply {
+                    homeViewModel = homeFragmentViewModel
+                    lifecycleOwner = this@HomeFragment
+                }
+
+
+        setObservers()
+
+        return homeFragmentBinding.root
+    }
+
+    private fun setObservers() {
+        observeActivityCountry()
+        observeDailyStatistics()
+    }
+
+    private fun observeActivityCountry() {
         activity?.let { fragmentActivity ->
             val coronaActivityViewModel = ViewModelProvider(fragmentActivity).get(CoronaActivityViewModel::class.java)
             coronaActivityViewModel.country.observe(viewLifecycleOwner, Observer {
                 homeFragmentViewModel.country.value = it
             })
         }
+    }
 
-        val homeFragmentBinding = HomeFragmentBinding.inflate(inflater, container, false)
-                .apply {
-                    homeViewModel = homeFragmentViewModel
-                }
-
-        homeFragmentBinding.lifecycleOwner = this
-
-        return homeFragmentBinding.root
+    private fun observeDailyStatistics() {
+        homeFragmentViewModel.numberDailyStatistics.observe(viewLifecycleOwner, Observer { timeSeriesDataList ->
+            var infected = 0
+            var recovered = 0
+            var deaths = 0
+            timeSeriesDataList.forEach {
+                infected += it.infectedCases
+                recovered += it.recoveredCases
+                deaths += it.deathCases
+            }
+            homeFragmentViewModel.infected.value = "$infected"
+            homeFragmentViewModel.recovered.value = "$recovered"
+            homeFragmentViewModel.deaths.value = "$deaths"
+        })
     }
 
 }

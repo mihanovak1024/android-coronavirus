@@ -39,10 +39,10 @@
                     android:layout_height="wrap_content"
                     android:fontFamily="@font/bungee"
                     android:gravity="center"
-                    android:text="@{Integer.toString(homeViewModel.numberDailyStatistics.infectedCases)}"
+                    android:includeFontPadding="false"
+                    android:text="@{homeViewModel.infected}"
                     android:textColor="@android:color/holo_red_dark"
                     android:textSize="30sp"
-                    android:includeFontPadding="false"
                     tools:text="24" />
             </LinearLayout>
 
@@ -65,10 +65,10 @@
                     android:fontFamily="@font/bungee"
 
                     android:gravity="center"
-                    android:text="@{Integer.toString(homeViewModel.numberDailyStatistics.deathCases)}"
+                    android:includeFontPadding="false"
+                    android:text="@{homeViewModel.deaths}"
                     android:textColor="@android:color/black"
                     android:textSize="30sp"
-                    android:includeFontPadding="false"
                     tools:text="24" />
             </LinearLayout>
 
@@ -89,20 +89,15 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:fontFamily="@font/bungee"
-                    android:includeFontPadding="false"
                     android:gravity="center"
-                    android:text="@{Integer.toString(homeViewModel.numberDailyStatistics.recoveredCases)}"
+                    android:includeFontPadding="false"
+                    android:text="@{homeViewModel.recovered}"
                     android:textColor="@android:color/holo_green_dark"
                     android:textSize="30sp"
                     tools:text="24" />
 
             </LinearLayout>
         </LinearLayout>
-
-        <androidx.recyclerview.widget.RecyclerView
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1" />
 
     </LinearLayout>
 </layout>

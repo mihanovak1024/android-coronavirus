@@ -67,12 +67,13 @@ class LocationSwitchButton : LinearLayout {
     }
 
     private fun localButtonClicked() {
-        onLocationSwitchClickCallback?.onLocalButtonClicked(context, !localButtonAlreadyClicked)
+        var firstClick = !localButtonAlreadyClicked
         if (!localButtonAlreadyClicked) {
             localButtonAlreadyClicked = true
             switchLocalWorldwideButtonsStyle(local_button, worldwide_button)
             updateSharedPreferencesClick(true)
         }
+        onLocationSwitchClickCallback?.onLocalButtonClicked(context, firstClick)
     }
 
     private fun updateSharedPreferencesClick(countryClicked: Boolean) {
