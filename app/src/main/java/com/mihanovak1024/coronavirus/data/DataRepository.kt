@@ -1,10 +1,8 @@
 package com.mihanovak1024.coronavirus.data
 
 import androidx.lifecycle.LiveData
-import com.mihanovak1024.coronavirus.data.database.DailyStatisticsDao
 import com.mihanovak1024.coronavirus.data.database.TimeSeriesCaseDataDao
 import com.mihanovak1024.coronavirus.data.database.TimeSeriesCasePlaceDao
-import com.mihanovak1024.coronavirus.data.model.DailyStatistics
 import com.mihanovak1024.coronavirus.data.model.timeseries.TimeSeriesCaseData
 import com.mihanovak1024.coronavirus.data.model.timeseries.TimeSeriesCasePlace
 import com.mihanovak1024.coronavirus.data.network.DataSource
@@ -20,8 +18,7 @@ import timber.log.Timber
 class DataRepository(
         private val dataSource: DataSource,
         private val timeSeriesCaseDataDao: TimeSeriesCaseDataDao,
-        private val timeSeriesCasePlaceDao: TimeSeriesCasePlaceDao,
-        private val dailyStatisticsDao: DailyStatisticsDao
+        private val timeSeriesCasePlaceDao: TimeSeriesCasePlaceDao
 ) : Repository {
 
     override fun getTimeSeriesCaseAllDataForDate(date: OffsetDateTime): LiveData<List<TimeSeriesCaseData>> {
@@ -31,11 +28,18 @@ class DataRepository(
         return timeSeriesCaseDataDao.loadForDate(date)
     }
 
-    override fun getStatisticsForDate(date: OffsetDateTime): LiveData<DailyStatistics> {
-        Timber.d("getStatisticsForDate - date = %s", date)
+    override fun getTimeSeriesCaseDataForLastDateAndCountry(country: String): LiveData<List<TimeSeriesCaseData>> {
+        Timber.d("getTimeSeriesCaseDataForLastDateAndPlace")
         refreshTimeSeriesDataAsync()
 
-        return dailyStatisticsDao.loadStatisticsForDate(date)
+        return timeSeriesCaseDataDao.loadForCountryForLastDate(country)
+    }
+
+    override fun getInfectedCountries(): LiveData<List<String>> {
+        Timber.d("getInfectedLocations")
+        refreshTimeSeriesDataAsync()
+
+        return timeSeriesCasePlaceDao.loadCountries()
     }
 
     private fun refreshTimeSeriesDataAsync() {
@@ -45,7 +49,7 @@ class DataRepository(
             val dateYesterday = OffsetDateTime.of(LocalDate.now(), LocalTime.MIDNIGHT, UTC).minusDays(1)
             Timber.d("dateYesterday = %s", dateYesterday)
 
-            val databaseDates = dailyStatisticsDao.loadDates()
+            val databaseDates = timeSeriesCaseDataDao.loadDates()
             if (databaseDates.isEmpty() || !databaseDates.contains(dateYesterday)) {
                 Timber.d("Yesterday data not in database")
 
@@ -59,36 +63,42 @@ class DataRepository(
     }
 
     /**
-     * Updates the database of [TimeSeriesCaseData], [TimeSeriesCasePlace] and [DailyStatistics].
+     * Updates the database of [TimeSeriesCaseData] and [TimeSeriesCasePlace].
      *
      * Ignores values already present in database.
      */
     private suspend fun updateDatabaseData(databaseDates: List<OffsetDateTime>, timeSeriesData: LinkedHashMap<OffsetDateTime, LinkedHashMap<String, TimeSeriesCaseData>>) {
         val timeSeriesDataList: MutableList<TimeSeriesCaseData> = mutableListOf()
-        val timeSeriesPlaceList: MutableList<TimeSeriesCasePlace> = mutableListOf()
-        val dailyStatisticsList: MutableList<DailyStatistics> = mutableListOf()
+        val timeSeriesPlaceMap: MutableMap<String, TimeSeriesCasePlace> = mutableMapOf()
+        var timeSeriesCaseWorldwide = timeSeriesCasePlaceDao.loadByCountry("worldwide").value
+        if (timeSeriesCaseWorldwide == null) {
+            Timber.d("No worldwide place in database, creating...")
+            timeSeriesCaseWorldwide = TimeSeriesCasePlace(0, "", "worldwide", 0.0, 0.0)
+            timeSeriesPlaceMap["-worldwide"] = timeSeriesCaseWorldwide
+        }
 
         timeSeriesData.forEach {
             // Checks which dates are already in the local database
             if (!databaseDates.contains(it.key)) {
-                val statistics = DailyStatistics(date = it.key)
+                val dailyStatistics = TimeSeriesCaseData(offsetDateTime = it.key, place = timeSeriesCaseWorldwide)
                 it.value.forEach { placeMap ->
                     placeMap.value.apply {
-                        statistics.deathNumber += deathCases
-                        statistics.infectedNumber += infectedCases
-                        statistics.recoveredNumber += recoveredCases
+                        dailyStatistics.deathCases += deathCases
+                        dailyStatistics.infectedCases += infectedCases
+                        dailyStatistics.recoveredCases += recoveredCases
 
-                        timeSeriesPlaceList.add(place!!)
                         timeSeriesDataList.add(this)
+                        timeSeriesPlaceMap["${place!!.state}-${place!!.country}"] = place!!
                     }
                 }
-                dailyStatisticsList.add(statistics)
+                timeSeriesDataList.add(dailyStatistics)
             }
         }
 
+
+
         timeSeriesCaseDataDao.saveMultiple(timeSeriesDataList)
-        timeSeriesCasePlaceDao.saveMultiple(timeSeriesPlaceList)
-        dailyStatisticsDao.saveMultiple(dailyStatisticsList)
+        timeSeriesCasePlaceDao.saveMultiple(timeSeriesPlaceMap.values.toList())
     }
 
 }
